@@ -3,8 +3,16 @@ defmodule AmazonProductAdvertisingClient.Config do
   The configuration used for authorizing and versioning API requests.
   """
 
-  defstruct "AssociateTag": Application.get_env(:amazon_product_advertising_client, :associate_tag),
-    "AWSAccessKeyId": Application.get_env(:amazon_product_advertising_client, :aws_access_key_id),
+  defstruct "AssociateTag": nil,
+    "AWSAccessKeyId": nil,
     "Service": "AWSECommerceService",
-    "Version": "2013-08-01"
+    "Version": "2013-08-01",
+    aws_secret_access_key: nil
+
+  def build(tag, key_id, key_secret) do
+    %__MODULE__{
+      "AssociateTag": tag,
+      "AWSAccessKeyId": key_id, 
+      aws_secret_access_key: key_secret}
+  end
 end

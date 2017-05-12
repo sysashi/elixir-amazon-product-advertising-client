@@ -16,8 +16,11 @@ defmodule AmazonProductAdvertisingClient do
   Make a call to the API with the specified request parameters.
   """
   def call_api(request_params, config \\ %Config{}) do
+    {secret, config} = Map.pop(config, :aws_secret_access_key)
     query = [request_params, config] |> combine_params |> percent_encode_query
-    get %URI{scheme: @scheme, host: @host, path: @path, query: query}
+    %URI{scheme: @scheme, host: @host, path: @path, query: query}
+    |> build_url(secret)
+    |> get()
   end
 
   defp combine_params(params_list) do
@@ -39,18 +42,18 @@ defmodule AmazonProductAdvertisingClient do
     "=" <> URI.encode(Kernel.to_string(v), &URI.char_unreserved?/1)
   end
 
-  def process_url(url) do
-    url |> URI.parse |> timestamp_url |> sign_url |> String.Chars.to_string
+  def build_url(url, secret) do
+    url |> URI.parse |> timestamp_url |> sign_url(secret) |> String.Chars.to_string
   end
 
   defp timestamp_url(url_parts) do
     update_url url_parts, "Timestamp", Timex.format!(Timex.local, "{ISO:Extended:Z}")
   end
 
-  defp sign_url(url_parts) do
+  defp sign_url(url_parts, secret) do
     hmac = :crypto.hmac(
         :sha256,
-        Application.get_env(:amazon_product_advertising_client, :aws_secret_access_key),
+        secret,
         Enum.join(["GET", url_parts.host, url_parts.path, url_parts.query], "\n")
       )
     signature = Base.encode64(hmac)
