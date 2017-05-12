@@ -9,7 +9,7 @@ defmodule AmazonProductAdvertisingClient.Config do
     "Version": "2013-08-01",
     aws_secret_access_key: nil
 
-  def build(tag, key_id, key_secret) do
+  def build(%{tag: tag, key_id: key_id, key_secret: key_secret}) do
     %__MODULE__{
       "AssociateTag": tag,
       "AWSAccessKeyId": key_id, 
