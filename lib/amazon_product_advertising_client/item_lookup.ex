@@ -3,6 +3,8 @@ defmodule AmazonProductAdvertisingClient.ItemLookup do
   The [ItemLookup](http://docs.aws.amazon.com/AWSECommerceService/latest/DG/ItemLookup.html) operation
   """
 
+  @opaque t :: %__MODULE__{}
+
   alias __MODULE__
   alias AmazonProductAdvertisingClient.Config
 
