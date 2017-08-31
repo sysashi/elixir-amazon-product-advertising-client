@@ -17,15 +17,33 @@ defmodule AmazonProductAdvertisingClient do
   """
   def call_api(request_params, config \\ %Config{}) do
     {secret, config} = Map.pop(config, :aws_secret_access_key)
-    query = [request_params, config] |> combine_params |> percent_encode_query
+    query = build_query([request_params, config])
     %URI{scheme: @scheme, host: @host, path: @path, query: query}
     |> build_url(secret)
     |> get()
   end
 
+  defp build_query(params_list) do
+    params_list
+    |> to_map
+    |> remove_empty
+    |> combine_params
+    |> percent_encode_query
+  end
+
+  defp to_map(params_list), do: Enum.map(params_list, &Map.from_struct/1)
+
+  defp remove_empty(params_list) do
+    Enum.map(params_list, fn params ->
+      params
+      |> Enum.reject(fn {_, v} -> is_nil(v) end)
+      |> Enum.into(%{})
+    end)
+  end
+
   defp combine_params(params_list) do
     List.foldl params_list, Map.new, fn(params, all_params) ->
-      Map.merge Map.from_struct(params), all_params
+      Map.merge params, all_params
     end
   end
 
