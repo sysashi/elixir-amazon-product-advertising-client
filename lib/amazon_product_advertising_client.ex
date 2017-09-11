@@ -17,8 +17,9 @@ defmodule AmazonProductAdvertisingClient do
   """
   def call_api(request_params, config \\ %Config{}) do
     {secret, config} = Map.pop(config, :aws_secret_access_key)
+    {host, config} = Map.pop(config, :endpoint, @host)
     query = build_query([request_params, config])
-    %URI{scheme: @scheme, host: @host, path: @path, query: query}
+    %URI{scheme: @scheme, host: host, path: @path, query: query}
     |> build_url(secret)
     |> get()
   end
